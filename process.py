@@ -16,6 +16,9 @@ doc = yaml.safe_load(docf)
 
 buildings = [v for v in doc["data"]["game_recipes"]
     if v["type"] == "ASSEMBLE" and v["name"] not in [
+        "Antimatter Fuel Rod",
+        "Hydrogen Fuel Rod",
+        "Deuteron Fuel Rod",
         "Proliferator Mk.I",
         "Proliferator Mk.II",
         "Proliferator Mk.III",
