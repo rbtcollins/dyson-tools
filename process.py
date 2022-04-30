@@ -110,14 +110,17 @@ order = [[k] + v for (n,k,v) in sorted(((len(v), k, v) for (k,v) in clusters.ite
 pprint.pprint(order)
 print("====================")
 
-
+clusters = []
 for cluster in order:
     inputs = set()
     for recipe_name in cluster:
         recipe = building_to_recipe[recipe_name]
         building_inputs = get_building_inputs(recipe)
         inputs.update([get_input(input)["name"] for input in get_inputs(recipe) if input not in building_inputs])
+    clusters.append((len(inputs), inputs, cluster))
 
+
+for (_, inputs, cluster) in sorted(clusters, reverse=True):
     scheduled = False
     for line in lines:
         missing_inputs = inputs - line["inputs"]
