@@ -37,18 +37,18 @@ def get_building_inputs(building):
     return [input for input in get_inputs(building) if get_input(input)["name"] in building_to_recipe]
 
 building_to_recipe = {}
-recipe_to_building = defaultdict(list)
+item_to_building = defaultdict(list)
 inputs = set()
 for building in buildings:
     building_to_recipe[building["name"]] = building
     for input in get_inputs(building):
-        recipe_to_building[get_input(input)["name"]].append(building["name"])
+        item_to_building[input].append(building["name"])
         #  = doc["data"]["game_items"][value]
         inputs.add(input)
     
 print("====================")
-pprint.pprint(recipe_to_building)
-pprint.pprint(len(recipe_to_building))
+pprint.pprint(item_to_building)
+pprint.pprint(len(item_to_building))
 print("====================")
 def observe_depth(depths, name, depth):
     if name not in depths or depths[name] < depth:
@@ -138,6 +138,7 @@ for cluster in order:
 
 
 pprint.pprint(lines)
+print(len(lines), " lines")
+print(len([(get_input(item)["name"], get_input(item)["type"]) for item in item_to_building.keys() if get_input(item)["type"] not in {"LOGISTICS", "PRODUCTION"}]), " inputs")
 
 print("====================")
-import pdb;pdb.set_trace()
