@@ -114,14 +114,18 @@ pprint.pprint(order)
 print("====================")
 
 clusters = []
+resource_order = {}
+
 for cluster in order:
     inputs = set()
     for recipe_name in cluster:
         recipe = building_to_recipe[recipe_name]
         building_inputs = get_building_inputs(recipe)
-        inputs.update([get_input(input)["name"] for input in get_inputs(recipe) if input not in building_inputs])
-    clusters.append((len(inputs), inputs, cluster))
+        # filter down to just the inputs we want on lines
+        line_inputs = [get_input(input)["name"] for input in get_inputs(recipe) if input not in building_inputs]
+        inputs.update(line_inputs)
 
+    clusters.append((len(inputs), inputs, cluster))
 
 for (_, inputs, cluster) in sorted(clusters, reverse=True):
     scheduled = False
@@ -131,19 +135,40 @@ for (_, inputs, cluster) in sorted(clusters, reverse=True):
             line["recipes"].extend(cluster)
             line["inputs"].update(missing_inputs)
             scheduled = True
+            for input in missing_inputs:
+                if input not in resource_order:
+                    resource_order[input] = len(resource_order)
             break
         else:
             continue
     
-    if not scheduled:
+    if not scheduled: # new line needed
         lines.append({"inputs": inputs, "recipes": cluster})
+        for input in inputs:
+            if input not in resource_order:
+                resource_order[input] = len(resource_order)
+
         # print(recipe_name, inputs)
         # import pdb;pdb.set_trace()
     # for line in lines
 
 
 
-pprint.pprint(lines)
+for (pos, line) in enumerate(lines):
+    print("======= line ", pos, "=============")
+    for (pos, input) in enumerate(line["inputs"]):
+        if pos == 0:
+            prefix = "inputs: "
+        else:
+            prefix = "        "
+        print(prefix, input, resource_order[input])
+    for (pos, recipe) in enumerate(line["recipes"]):
+        if pos == 0:
+            prefix = "recipes: "
+        else:
+            prefix = "         "
+        print(prefix, recipe)
+# pprint.pprint(lines)
 print(len(lines), " lines")
 print(len([(get_input(item)["name"], get_input(item)["type"]) for item in item_to_building.keys() if get_input(item)["type"] not in {"LOGISTICS", "PRODUCTION"}]), " inputs")
 
