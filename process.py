@@ -135,23 +135,21 @@ for (_, inputs, cluster) in sorted(clusters, reverse=True):
             line["recipes"].extend(cluster)
             line["inputs"].update(missing_inputs)
             scheduled = True
-            for input in missing_inputs:
-                if input not in resource_order:
-                    resource_order[input] = len(resource_order)
             break
         else:
             continue
     
     if not scheduled: # new line needed
         lines.append({"inputs": inputs, "recipes": cluster})
-        for input in inputs:
-            if input not in resource_order:
-                resource_order[input] = len(resource_order)
 
         # print(recipe_name, inputs)
         # import pdb;pdb.set_trace()
     # for line in lines
 
+for line in lines:
+    for input in line["inputs"]:
+            if input not in resource_order:
+                resource_order[input] = len(resource_order)
 
 
 for (pos, line) in enumerate(lines):
